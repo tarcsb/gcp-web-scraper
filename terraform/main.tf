@@ -4,54 +4,18 @@ provider "google" {
   credentials = file("${path.module}/../${var.google_application_credentials}")
 }
 
-resource "google_storage_bucket" "scraper_bucket" {
-  name     = "${var.project_id}-scraper-bucket"
-  location = var.region
+module "compute_instance" {
+  source = "./modules/google_compute_instance"
 }
 
-resource "google_storage_bucket_object" "scraper_code" {
-  name   = "scraper.py"
-  bucket = google_storage_bucket.scraper_bucket.name
-  source = "../src/scraper.py"
+module "cloudfunctions_function" {
+  source = "./modules/google_cloudfunctions_function"
 }
 
-resource "google_cloudfunctions_function" "scraper_function" {
-  name        = "web_scraper"
-  description = "Cloud Function to scrape websites"
-  runtime     = "python39"
-
-  entry_point = "main"
-  source_archive_bucket = google_storage_bucket.scraper_bucket.name
-  source_archive_object = google_storage_bucket_object.scraper_code.name
-  trigger_http = true
-
-  available_memory_mb   = 128
-  timeout               = 60
-
-  environment_variables = {
-    MONDAY_API_KEY = var.monday_api_key
-    WEBSITE_URL    = var.website_url
-    BOARD_ID       = var.board_id
-    GROUP_ID       = var.group_id
-  }
+module "storage_bucket" {
+  source = "./modules/google_storage_bucket"
 }
 
-resource "google_compute_instance" "web_scraper" {
-  name         = "web-scraper"
-  machine_type = var.machine_type
-  zone         = var.zone
-
-  boot_disk {
-    initialize_params {
-      image = "projects/debian-cloud/global/images/family/debian-10"
-    }
-  }
-
-  network_interface {
-    network = "default"
-
-    access_config {
-      // Ephemeral IP
-    }
-  }
+module "pubsub" {
+  source = "./modules/google_pubsub"
 }

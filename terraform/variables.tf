@@ -6,13 +6,12 @@ variable "project_id" {
 variable "region" {
   description = "The GCP region"
   type        = string
-  default     = "us-east1"
+  default     = "us-central1"
 }
 
-variable "zone" {
-  description = "The GCP zone"
+variable "google_application_credentials" {
+  description = "The path to the GCP credentials file"
   type        = string
-  default     = "us-east1-b"
 }
 
 variable "monday_api_key" {
@@ -35,19 +34,14 @@ variable "group_id" {
   type        = string
 }
 
+variable "zone" {
+  description = "The GCP zone"
+  type        = string
+  default     = "us-central1-a"
+}
+
 variable "machine_type" {
   description = "The machine type for the GCP instance"
   type        = string
   default     = "f1-micro"
-}
-
-variable "boot_disk_image" {
-  description = "The boot disk image for the GCP instance"
-  type        = string
-  default     = "debian-cloud/debian-10"
-}
-
-variable "google_application_credentials" {
-  description = "The path to the GCP credentials file"
-  type        = string
 }
